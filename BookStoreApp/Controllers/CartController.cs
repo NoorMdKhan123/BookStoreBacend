@@ -24,19 +24,19 @@ namespace BookStoreApp.Controllers
             _iconfig = iconfig;
         }
         [Authorize]
-        [HttpPost("addingbooks")]
-        public IActionResult AddingBook(BookCart model)
+        [HttpPost("addingbooks{bookId}")]
+        public IActionResult AddingBook(BookCart model, long bookId)
         {
         
             long userId = Convert.ToInt64(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
 
-            var result = this._cartBL.AddingBook(model, userId);
+            var book = this._cartBL.AddingBook(model, userId, bookId);
 
-            return this.Ok(new { Success = true, Message = "Book got added to cart", Data = result });
+            return this.Ok(new { Success = true, Message = "Book got added to cart", book});
         }
 
         [Authorize]
-        [HttpPut("cartId")]
+        [HttpPut("{cartId}")]
         public IActionResult  UpdateCart(BookUpdateModel model, long cartId)
         {
             var result = this._cartBL.UpdateCart(model, cartId);
@@ -50,9 +50,9 @@ namespace BookStoreApp.Controllers
         {
             long userId = Convert.ToInt64(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
 
-            var result = this._cartBL.GetAllCartData(userId);
+            var cartData = this._cartBL.GetAllCartData(userId);
 
-            return this.Ok(new { Success = true, Message = "Book got added to cart", Data = result });
+            return this.Ok(new { Success = true, Message = "Book got added to cart", cartData });
 
         }
 
@@ -62,7 +62,7 @@ namespace BookStoreApp.Controllers
         {
             long userId = Convert.ToInt64(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
 
-            var result = this._cartBL.DeleteCartDetails(userId);
+            var result = this._cartBL.DeleteCartDetails(cartId);
 
             return this.Ok(new { Success = true, Message = "details from cart got deleted" });
 

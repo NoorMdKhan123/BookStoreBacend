@@ -16,5 +16,7 @@ namespace RepositoryLayer.Interfaces
 
         string DeletBookRecord(long bookId);
 
+        BookResponseModel UpdateImage(long bookId, Microsoft.AspNetCore.Http.IFormFile bookImage, long userId);
+
     }
 }

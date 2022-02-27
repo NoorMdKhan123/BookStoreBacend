@@ -16,9 +16,9 @@ namespace BusinessLayer.Services
             _cartRL = cartRL;
 
         }
-        public CartModel AddingBook(BookCart model, long userId)
+        public CartModel AddingBook(BookCart model, long userId, long bookId)
         {
-            return this._cartRL.AddingBook(model, userId);
+            return this._cartRL.AddingBook(model, userId,bookId);
         }
 
         public BookUpdateModel UpdateCart(BookUpdateModel model, long cartId)

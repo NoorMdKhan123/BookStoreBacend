@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces;
 using CommonLayer.Model;
+using Microsoft.AspNetCore.Http;
 using RepositoryLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,11 @@ namespace BusinessLayer.Services
         public string DeletBookRecord(long bookId)
         {
             return this.bookRL.DeletBookRecord(bookId);
+        }
+
+        public BookResponseModel UpdateImage(long bookId, IFormFile bookImage, long userId)
+        {
+            return this.bookRL.UpdateImage(bookId, bookImage, userId);
         }
     }
 }

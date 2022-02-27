@@ -18,6 +18,8 @@ namespace CommonLayer.Model
 
         public int OriginalPrice { get; set; }
 
+        public string Comment { get; set; }
+
         public int DiscountedPrice { get; set; }
 
         public string Description { get; set; }

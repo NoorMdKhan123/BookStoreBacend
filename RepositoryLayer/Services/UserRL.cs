@@ -38,7 +38,7 @@ namespace RepositoryLayer.Services
                         cmd.CommandType = CommandType.StoredProcedure;
                         SqlParameter sqlParameter = cmd.Parameters.AddWithValue("@FullName", user.FullName);
                         cmd.Parameters.AddWithValue("@EmailId", user.EmailId);
-                        cmd.Parameters.AddWithValue("@Password", SecureData.ConvertToEncrypt(user.Password));
+                        cmd.Parameters.AddWithValue("@Password", EncryptPassword.ConvertToEncrypt(user.Password));
                         cmd.Parameters.AddWithValue("@MobileNumber", user.MobileNumber);
 
                         con.Open();
@@ -80,21 +80,22 @@ namespace RepositoryLayer.Services
             if (user != null)
             {
                 string ConnectionStrings = _config.GetConnectionString(connectionString);
-                SqlDataReader dr;
+               
                 using (SqlConnection con = new SqlConnection(ConnectionStrings))
                 {
-                    SqlCommand cmd = new SqlCommand("spUsersLogin", con);
+                    SqlCommand cmd = new SqlCommand("spUserLoginDetails", con);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.Parameters.AddWithValue("@EmailId", user.EmailId);
-                    cmd.Parameters.AddWithValue("@Password", SecureData.ConvertToEncrypt( user.Password));
                     
+                    cmd.Parameters.AddWithValue("@EmailId", user.EmailId);
+                    cmd.Parameters.AddWithValue("@Password", EncryptPassword.ConvertToEncrypt( user.Password));
+                    con.Open();
                     LoginResponseModel registerModel = new LoginResponseModel();
-                    dr = cmd.ExecuteReader();
-                   if( dr.Read())
 
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
                     {
-                        registerModel.UserId = Convert.ToInt64(dr["UserId"]);
+                        registerModel.UserId = Convert.ToInt32(dr["UserId"]);
                         registerModel.FullName = dr["FullName"].ToString();
                         registerModel.EmailId = dr["EmailId"].ToString();
                         registerModel.MobileNumber = (dr["MobileNumber"]).ToString();
@@ -102,9 +103,8 @@ namespace RepositoryLayer.Services
                         registerModel.Token = token;
 
                         return registerModel;
-                        
                     }
-                    throw new CustomException("no records");
+                    throw new CustomException("no value to read");
                 }
 
             }
@@ -143,23 +143,31 @@ namespace RepositoryLayer.Services
             throw new KeyNotFoundException("details are empty");
         }
 
-        public string ForgotPassword(string EmailId , long UserId)
+        public string ForgotPassword(ForgetResponse response)
         {
             string ConnectionStrings = _config.GetConnectionString(connectionString);
 
             using (SqlConnection con = new SqlConnection(ConnectionStrings))
             {
-                SqlCommand cmd = new SqlCommand("spForgotUserPassword", con);
+                SqlCommand cmd = new SqlCommand("spFrgotPswrd", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@EmailId", EmailId);
-                cmd.Parameters.AddWithValue("@Userd", UserId);
+                cmd.Parameters.AddWithValue("@EmailId", response.Email);
+                
 
                 con.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
-                if (rdr.Read())
-                {
-                    
-                    var token = GenerateJWTToken(EmailId, UserId);
+
+                    if (rdr.HasRows)
+                    {
+                    User user = new User();
+                    while (rdr.Read())
+                    {
+                       
+                        user.UserId = Convert.ToInt32(rdr["UserId"]);
+                        user.EmailId = (rdr["EmailId"]).ToString();
+                    }
+
+                    var token = GenerateJWTToken(user.EmailId,user.UserId);
                     new MsmqModel().MsmqSender(token);
                     return "email is sent successfully";
                 }
@@ -168,7 +176,7 @@ namespace RepositoryLayer.Services
             }
         }
 
-        public string ResetPassword(ResetPasswordModel model)
+        public string ResetPassword(ResetPasswordModel model, string emailId)
         {
             if (model != null)
             {
@@ -176,17 +184,26 @@ namespace RepositoryLayer.Services
 
                 using (SqlConnection con = new SqlConnection(ConnectionStrings))
                 {
-                    SqlCommand cmd = new SqlCommand("spResetUserPassword", con);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@EmailId", model.EmailId);
-                    cmd.Parameters.AddWithValue("@NewPassword", SecureData.ConvertToEncrypt(model.NewPassword));
-                    con.Open();
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    if (model.NewPassword == model.ConfirmPassword)
                     {
-                        return "Password reset is successful";
+                        SqlCommand cmd = new SqlCommand("spResetUserPassword", con);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@EmailId", emailId);
+                        cmd.Parameters.AddWithValue("@NewPassword", SecureData.ConvertToEncrypt(model.NewPassword));
+
+
+                        con.Open();
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        if (dr.Read())
+                        {
+                            return "Password reset is successful";
+                        }
+                        throw new InvalidOperationException("password not updated");
+
                     }
-                    throw new InvalidOperationException("password not updated");
+                    throw new CustomException("values doesn't match");
+                   
                 }
             }
             throw new ArgumentNullException("object is empty");

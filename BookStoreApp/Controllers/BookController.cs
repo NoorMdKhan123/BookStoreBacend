@@ -55,23 +55,23 @@ namespace BookStoreApp.Controllers
         {
             long userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
 
-            var result = this._bookBL.GetBookDetailsById(bookId, userId);
+            var book = this._bookBL.GetBookDetailsById(bookId, userId);
 
 
-            return this.Ok(new { Success = true, message = "Registration Succesful", Data = result });
+            return this.Ok(new { Success = true, message = "Got book details by specific book id", book });
 
         }
 
-        [Authorize]
+       
         [HttpGet]
         public IActionResult GetAllBookDeatils()
         {
             
 
-            var result = this._bookBL.GetAllBookDeatils();
+            var book= this._bookBL.GetAllBookDeatils();
 
 
-            return this.Ok(new { Success = true, message = "Registration Succesful", Data = result });
+            return this.Ok(new { Success = true, message = "All books details", book });
 
         }
         [Authorize]
@@ -82,6 +82,16 @@ namespace BookStoreApp.Controllers
 
             var result = this._bookBL.DeletBookRecord(bookId);
             return this.Ok(new { Success = true, message = "Record deleted"});
+        }
+
+        [Authorize]
+        [HttpPut("Image/{bookId}")]
+        public IActionResult  UpdateImage(long bookId, IFormFile bookImage)
+        {
+            long userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
+            var result = this._bookBL.UpdateImage(bookId, bookImage, userId);
+            return this.Ok(new { Success = true, message = "Image uploaded Succesfully", Data = result });
+
         }
 
 

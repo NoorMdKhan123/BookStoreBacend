@@ -1,4 +1,5 @@
 ﻿using CommonLayer.Model;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,6 +17,8 @@ namespace BusinessLayer.Interfaces
         List<GetBookDeatils> GetAllBookDeatils();
 
          string DeletBookRecord(long bookId);
+
+        BookResponseModel UpdateImage(long bookId, IFormFile bookImage, long userId);
 
     }
 }

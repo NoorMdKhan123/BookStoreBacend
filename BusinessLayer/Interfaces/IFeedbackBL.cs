@@ -1,10 +1,15 @@
-﻿using System;
+﻿using CommonLayer.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BusinessLayer.Interfaces
 {
-    internal class IFeedbackBL
+    public interface IFeedbackBL
     {
+        FeedbackResponse AddingFeedback(long bookId, FeedbackModel model, long userId);
+
+        List<FeedbackResponse> GetAllReviews(long bookId);
+
     }
 }

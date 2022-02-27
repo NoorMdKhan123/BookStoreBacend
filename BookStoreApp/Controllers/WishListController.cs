@@ -22,7 +22,7 @@ namespace BookStoreApp.Controllers
             _iconfig = iconfig;
         }
         [Authorize]
-        [HttpPost]
+        [HttpPost("{bookId}")]
         public IActionResult WishListCreation(long bookId)
         {
             long userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
@@ -33,13 +33,13 @@ namespace BookStoreApp.Controllers
         }
 
         [Authorize]
-        [HttpDelete]
+        [HttpDelete("del/{wishListId}")]
         public IActionResult DeletWishList(long wishListId)
         {
             var result = this._wishlistBL.DeletWishList(wishListId);
 
 
-            return this.Ok(new { Success = true, message = "book added to wishlist" });
+            return this.Ok(new { Success = true, message = "delete from wishlist" });
 
         }
 
@@ -49,9 +49,9 @@ namespace BookStoreApp.Controllers
         {
             long userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);
 
-            var result = this._wishlistBL.GetWishlistDetailsByUserId(userId);
+            var wishlist = this._wishlistBL.GetWishlistDetailsByUserId(userId);
 
-                return this.Ok(new { Success = true, message = "book added to wishlist", Data = result });
+                return this.Ok(new { Success = true, message = "all details of wishlist", wishlist });
         }
 
 

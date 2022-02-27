@@ -69,13 +69,13 @@ namespace RepositoryLayer.Services
                 {
                     using (SqlConnection con = new SqlConnection(ConnectionStrings))
                     {
-                        SqlCommand cmd = new SqlCommand("spUpdateAddress", con);
+                        SqlCommand cmd = new SqlCommand("spUpdateAdress", con);
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@UserId", userId);
                         cmd.Parameters.AddWithValue("@Address", model.Address);
                         cmd.Parameters.AddWithValue("@City", model.City);
                         cmd.Parameters.AddWithValue("@State", model.State);
-                        cmd.Parameters.AddWithValue("@TypeId", model.TypeId);
+                        
                         con.Open();
                         if (cmd.ExecuteNonQuery() > 0)
                         {
@@ -84,7 +84,7 @@ namespace RepositoryLayer.Services
                             responseModel.Address = model.Address;
                             responseModel.City = model.City;
                             responseModel.State = model.State;
-                            responseModel.TypeId = model.TypeId;
+                           
                             return responseModel;
                         }
                         con.Close();

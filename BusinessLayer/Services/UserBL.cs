@@ -30,15 +30,15 @@ namespace BusinessLayer.Services
         }
 
 
-        public string ForgotPassword(string emailId, long userId)
+        public string ForgotPassword(ForgetResponse forgetResponse)
         {
-            return this.userRL.ForgotPassword(emailId, userId);
+            return this.userRL.ForgotPassword(forgetResponse);
         }
 
-        public string ResetPassword(ResetPasswordModel model)
+        public string ResetPassword(ResetPasswordModel model, string emailId)
         {
 
-            return this.userRL.ResetPassword(model);
+            return this.userRL.ResetPassword(model, emailId);
 
         }
         public string DeleteRecord(long Id)

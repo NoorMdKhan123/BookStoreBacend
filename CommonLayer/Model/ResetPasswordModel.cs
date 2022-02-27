@@ -6,8 +6,8 @@ namespace CommonLayer.Model
 {
     public class ResetPasswordModel
     {
-        public string EmailId { get; set; }
+        public string NewPassword { get; set; }
 
-        public string NewPassword { get; set; } 
+        public string ConfirmPassword { get; set; } 
     }
 }

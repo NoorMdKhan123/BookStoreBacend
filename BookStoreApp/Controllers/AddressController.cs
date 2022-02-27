@@ -48,7 +48,6 @@ namespace BookStoreApp.Controllers
 
         [Authorize]
         [HttpGet]
-
         public IActionResult GetAllAddres()
         {
             long userId = Convert.ToInt32(User.Claims.FirstOrDefault(e => e.Type == "UserId").Value);

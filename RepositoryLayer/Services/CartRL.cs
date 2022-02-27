@@ -22,9 +22,9 @@ namespace RepositoryLayer.Services
 
         public string connectionString { get; set; } = "BookstoreAppConnectionString";
 
-        public CartModel AddingBook(BookCart model, long userId)
+        public CartModel AddingBook(BookCart model, long userId, long bookId)
         {
-            if (model != null)
+            if (model != null) 
             {
                 string ConnectionStrings = _config.GetConnectionString(connectionString);
                 if (ConnectionStrings != null)
@@ -33,15 +33,15 @@ namespace RepositoryLayer.Services
                     {
                         SqlCommand cmd = new SqlCommand("spAddingBook", con);
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@BookId", model.BookId);
+                        cmd.Parameters.AddWithValue("@BookId", bookId);
                         cmd.Parameters.AddWithValue("@UserId", userId);
-                        cmd.Parameters.AddWithValue("QtyToOrder", model.QtyToOrder);
+                        cmd.Parameters.AddWithValue("@QtyToOrder", model.QtyToOrder);
 
                         con.Open();
                         if (cmd.ExecuteNonQuery() > 0)
                         {
                             CartModel cart = new CartModel();
-                            cart.BookId = model.BookId;
+                            cart.BookId = bookId;
                             cart.UserId = userId;
                             cart.QtyToOrder = model.QtyToOrder;
 
@@ -98,7 +98,7 @@ namespace RepositoryLayer.Services
                 using (SqlConnection con = new SqlConnection(ConnectionStrings))
                 {
 
-                    SqlCommand cmd = new SqlCommand("spGtCartDeatil", con);
+                    SqlCommand cmd = new SqlCommand("spCartDetails", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
@@ -116,12 +116,12 @@ namespace RepositoryLayer.Services
                             bookDetails.BookTitle = reader["BookTitle"].ToString();
                             bookDetails.BookAuthor = reader["BookAuthor"].ToString();
                             bookDetails.OriginalPrice = Convert.ToInt32(reader["OriginalPrice"]);
-                            //bookDetails.Rating = (float)reader["Rating"];
-                            
-
-
-
+                            bookDetails.Rating = Convert.ToSingle(reader["Rating"]);
+                            bookDetails.RatingCount = Convert.ToInt32(reader["RatingCount"]);
+                            bookDetails.Description = reader["Description"].ToString();
+                            bookDetails.BookQty = Convert.ToInt32(reader["BookQty"]);
                             bookDetails.DiscountedPrice = Convert.ToInt32(reader["DiscountedPrice"]);
+                            bookDetails.Image = reader["Image"].ToString();
                            
                             cartDetails.CartId = Convert.ToInt64(reader["CartId"]);
                             cartDetails.UserId = userId;
@@ -159,12 +159,16 @@ namespace RepositoryLayer.Services
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@CartId", cartId);
                         con.Open();
-                        if (cmd.ExecuteNonQuery() == 1)
+                        
+                        int a = cmd.ExecuteNonQuery();
+                        if (a > 0)
                         {
-                            return "record deleted successfully";
-
+                            return "Book got  deleted from wishlist";
                         }
-                        con.Close();
+                        else
+                        {
+                            return "Book is not present in the wishlist";
+                        }
                         throw new KeyNotFoundException("Id not found");
                     }
 

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using CommonLayer.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RepositoryLayer.Interfaces
 {
-    internal interface IFeedback
+    public interface IFeedbackRL
     {
+        FeedbackResponse AddingFeedback(long bookId, FeedbackModel model, long userId);
+        List<FeedbackResponse> GetAllReviews(long bookId);
     }
 }

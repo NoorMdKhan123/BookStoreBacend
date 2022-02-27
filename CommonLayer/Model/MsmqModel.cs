@@ -33,7 +33,7 @@ namespace CommonLayer.Model
             var message = msmq.EndReceive(e.AsyncResult);
             string token = message.Body.ToString();
             string Subject = "Fundoo Notes Application Password Reset";
-            string Body = $"<a href = http://localhost:4200/resetPassword/{token} click me </a>" + "Token ->:" + token;
+            string Body = $"<a href = http://localhost:4200/resetPassword/{token}  click me </a>" + "Token ->:" + token;
             string jwt = DecodeJwt(token);
 
 

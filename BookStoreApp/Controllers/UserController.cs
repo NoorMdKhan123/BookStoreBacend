@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Security.Claims;
 
 namespace BookStoreApp.Controllers
 {
@@ -37,13 +38,13 @@ namespace BookStoreApp.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult GetLogin([FromBody] UserLogin credentials)
+        public IActionResult GetLogin(UserLogin credentials)
         {
             
             var result = this._userBL.GetLogin(credentials);
 
 
-            return this.Ok(new { Success = true, message = "Logged in Succesful", Data = result });
+            return this.Ok(new { Success = true, message = "Logged in Succesful", result });
         }
         [HttpGet("allusers")]
         public IActionResult GetAllUsers()
@@ -53,10 +54,10 @@ namespace BookStoreApp.Controllers
 
         }
 
-        [HttpPost("forgotpassword{emailId}")]
-        public IActionResult ForgotPassword(string emailId, long userId)
+        [HttpPost("forgotpassword")]
+        public IActionResult ForgotPassword(ForgetResponse forgetResponse)
         {
-            string result = this._userBL.ForgotPassword(emailId, userId);
+            string result = this._userBL.ForgotPassword(forgetResponse);
 
             return this.Ok(new { Success = true, Message = "User records found", Data = result });
 
@@ -65,7 +66,9 @@ namespace BookStoreApp.Controllers
         [HttpPut("resetpassword")]
         public IActionResult ResetPassword(ResetPasswordModel resetPasswordModel)
         {
-            string result = this._userBL.ResetPassword(resetPasswordModel);
+            string emailId = User.FindFirst(ClaimTypes.Email).Value.ToString();
+         
+            string result = this._userBL.ResetPassword(resetPasswordModel, emailId);
 
             return this.Ok(new { Success = true, Message = "Password got updated", Data = result });
         }

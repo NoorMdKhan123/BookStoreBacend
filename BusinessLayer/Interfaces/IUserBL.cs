@@ -13,9 +13,9 @@ namespace BusinessLayer
 
         string GenerateJWTToken(string EmailId, long userId);
 
-        string ForgotPassword(string emailId, long userId);
+        string ForgotPassword(ForgetResponse forgetResponse);
 
-        string ResetPassword(ResetPasswordModel model);
+        string ResetPassword(ResetPasswordModel model, string emailId);
 
         string DeleteRecord(long Id);
 

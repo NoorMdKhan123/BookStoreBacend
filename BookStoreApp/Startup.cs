@@ -46,6 +46,10 @@ namespace BookStoreApp
             services.AddTransient<IAddressRL, AddressRL>();
             services.AddTransient<IWishListBL, WishListBL>();
             services.AddTransient<IWishListRL, WishListRL>();
+            services.AddTransient<IOrdersBL, OrdersBL>();
+            services.AddTransient<IOrdersRL, OrdersRL>();
+            services.AddTransient<IFeedbackBL, FeedbackBL>();
+            services.AddTransient<IFeedbackRL, FeedbackRL>();
             services.AddControllers();
             // Enable Swagger   
             services.AddSwaggerGen(swagger =>
@@ -105,8 +109,17 @@ namespace BookStoreApp
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])) //Configuration["JwtToken:SecretKey"]  
                 };
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                name: "AllowOrigin",
+                builder => {
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
-           
+
+
 
 
         }

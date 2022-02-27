@@ -7,7 +7,7 @@ namespace RepositoryLayer.Interfaces
 {
     public interface ICartRL
     {
-        CartModel AddingBook(BookCart model, long userId);
+        CartModel AddingBook(BookCart model, long userId, long bookId);
 
         BookUpdateModel UpdateCart(BookUpdateModel model, long cartId);
 

@@ -110,22 +110,27 @@ namespace RepositoryLayer.Services
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@UserId", userId);
                         con.Open();
-                        SqlDataReader dr = cmd.ExecuteReader();
+                        SqlDataReader reader = cmd.ExecuteReader();
                         List<WishListModel> list = new List<WishListModel>();
-                        if (dr.HasRows)
+                        if (reader.HasRows)
                         {
-                            while (dr.Read())
+                            while (reader.Read())
                             {
                                 WishListModel wishlistModel = new WishListModel();
-                                BookDetailsModel bookModel = new BookDetailsModel();
-                                bookModel.BookTitle = dr["BookTitle"].ToString();
-                                bookModel.BookAuthor = dr["BookAuthor"].ToString();
-                                bookModel.DiscountedPrice = Convert.ToInt32(dr["DiscountedPrice"]);
-                                bookModel.OriginalPrice = Convert.ToInt32(dr["OriginalPrice"]);
-                                bookModel.Image = dr["Image"].ToString();
-                                wishlistModel.UserId = Convert.ToInt64(dr["UserId"]);
-                                wishlistModel.BookId = Convert.ToInt64(dr["BookId"]);
-                                wishlistModel.bookDetails = bookModel;
+                                BookDetailsModel bookDetails = new BookDetailsModel();
+                                bookDetails.BookTitle = reader["BookTitle"].ToString();
+                                bookDetails.BookAuthor = reader["BookAuthor"].ToString();
+                                bookDetails.OriginalPrice = Convert.ToInt32(reader["OriginalPrice"]);
+                                //bookDetails.Rating = (float)reader["Rating"];
+                                bookDetails.RatingCount = Convert.ToInt32(reader["RatingCount"]);
+                                bookDetails.Description = reader["Description"].ToString();
+                                bookDetails.BookQty = Convert.ToInt32(reader["BookQty"]);
+                                bookDetails.DiscountedPrice = Convert.ToInt32(reader["DiscountedPrice"]);
+                                bookDetails.Image = reader["Image"].ToString();
+                                wishlistModel.WishListId = Convert.ToInt32(reader["WishListId"]);
+                                wishlistModel.UserId = Convert.ToInt64(reader["UserId"]);
+                                wishlistModel.BookId = Convert.ToInt64(reader["BookId"]);
+                                wishlistModel.bookDetails = bookDetails;
                                 list.Add(wishlistModel);
                             }
                             return list;

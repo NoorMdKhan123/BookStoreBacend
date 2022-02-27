@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Http;
 using System.Text;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace RepositoryLayer.Services
 {
@@ -71,6 +74,7 @@ namespace RepositoryLayer.Services
             throw new ArgumentNullException("deatails are empty");
 
         }
+
 
 
         public BookDetailsModel UpdateBookDetails(BookDetailsModel model, long bookId)
@@ -161,7 +165,7 @@ namespace RepositoryLayer.Services
         public List<GetBookDeatils> GetAllBookDeatils()
         {
             List<GetBookDeatils> allBooksList = new List<GetBookDeatils>();
-            GetBookDeatils getBookDeatils = new GetBookDeatils();
+            
             string ConnectionStrings = _config.GetConnectionString(connectionString);
             if (ConnectionStrings != null)
             {
@@ -176,6 +180,7 @@ namespace RepositoryLayer.Services
                     {
                         while (dr.Read())
                         {
+                            GetBookDeatils getBookDeatils = new GetBookDeatils();
                             getBookDeatils.BookId = Convert.ToInt64(dr["BookId"]);
                             getBookDeatils.BookTitle = dr["BookTitle"].ToString();
                             getBookDeatils.BookAuthor = dr["BookAuthor"].ToString();
@@ -188,8 +193,10 @@ namespace RepositoryLayer.Services
                             getBookDeatils.Image = dr["Image"].ToString();
                             getBookDeatils.UserId = Convert.ToInt64(dr["UserId"]);
                             allBooksList.Add(getBookDeatils);
+                            
                         }
                         return allBooksList;
+                        throw new AccessViolationException("not able to access");
                     }
                     con.Close();
                     throw new InvalidOperationException("cannot fetched data by book Id");
@@ -246,8 +253,64 @@ namespace RepositoryLayer.Services
             throw new ArgumentNullException("value is not present");
 
         }
+
+
+
+
+        public BookResponseModel UpdateImage(long bookId, IFormFile bookImage, long userId)
+        {
+
+            Account account = new Account(this._config["Cloudinary:CloudName"], this._config["Cloudinary:APIKey"], this._config["Cloudinary:APISecret"]);
+            var imagePath = bookImage.OpenReadStream();
+            Cloudinary cloudinary = new Cloudinary(account);
+            ImageUploadParams imageParams = new ImageUploadParams()
+            {
+                File = new FileDescription(bookImage.FileName, imagePath)
+            };
+            string uploadImage = cloudinary.Upload(imageParams).Url.ToString();
+            string ConnectionStrings = _config.GetConnectionString(connectionString);
+            if (ConnectionStrings != null)
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionStrings))
+                {
+
+                    SqlCommand cmd = new SqlCommand("spUpdateImge", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@BookId", bookId);
+                    cmd.Parameters.AddWithValue("@BookImage", uploadImage);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    con.Open();
+
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+
+                        {
+                            BookResponseModel model = new BookResponseModel();
+
+                            model.UserId = userId;
+                            model.Image = dr["Image"].ToString();
+
+
+
+                            con.Close();
+                            return model;
+                        }
+                        throw new InvalidOperationException("no query excuted");
+                    }
+                    throw new CustomException("no rows found");
+
+                }
+                throw new ArgumentNullException("no image found to add");
+
+            }
+            throw new CustomException("Not able to connect to DB");
+
+
+
+        }
+
+
     }
-
-
-
 }

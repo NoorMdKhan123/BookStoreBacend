@@ -7,7 +7,7 @@ namespace BusinessLayer.Interfaces
 {
     public interface ICartBL
     {
-        CartModel AddingBook(BookCart model, long userId);
+        CartModel AddingBook(BookCart model, long userId, long bookId);
 
         BookUpdateModel UpdateCart(BookUpdateModel model, long cartId);
 

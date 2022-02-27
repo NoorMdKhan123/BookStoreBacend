@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CommonLayer.Model
 {
-    public class BookCart
+    public class ForgetResponse
     {
-        public int QtyToOrder { get; set; }
+        public string Email { get; set; }   
     }
 }

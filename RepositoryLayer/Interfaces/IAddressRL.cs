@@ -12,5 +12,6 @@ namespace RepositoryLayer.Interfaces
         AddressResponseModel UpdateAddress(AddressModel model, long userId);
 
         List<GetAllAddressModel> GetAllAddres(long userId);
+
     }
 }
